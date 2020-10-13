@@ -1,8 +1,9 @@
-nameserver: 'ddns.verst.eu.'
+nameserver: 'ddns.example.org.'
+mailbox: 'hostmaster.example.org.'
 
 users:
   - username: test
     password: test
     zones:
-      - example.org
-      - example.net
+      - example.org.
+      - sub.example.net.
