@@ -15,3 +15,10 @@ func LogMiddleware() mux.MiddlewareFunc {
 		})
 	}
 }
+
+func CatchHandler(w http.ResponseWriter, r *http.Request) {
+  log.Trace().Interface("ip", getUserIp(r)).Str("method", r.Method).
+    Str("path", r.URL.Path).Msg("CATCH")
+
+  http.NotFound(w, r)
+}

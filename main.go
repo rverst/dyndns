@@ -6,7 +6,8 @@ import (
 	"github.com/integrii/flaggy"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/rverst/dyndns/handler"
+  "github.com/rverst/dyndns/config"
+  "github.com/rverst/dyndns/handler"
 	"net/http"
 	"os"
 	"strconv"
@@ -79,6 +80,9 @@ func main() {
 
 	log.Logger = zerolog.New(consoleWriter).Level(level).With().Caller().Timestamp().Logger()
 
+	if err := config.LoadConfig(flConfig); err != nil {
+	  log.Fatal().Err(err).Send()
+  }
 	listen()
 }
 
@@ -86,7 +90,8 @@ func listen() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/health", handler.HealthHandler).Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/dnsupdate/fritz", handler.HealthHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/dnsupdate/fritz/", handler.FritzboxHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/", handler.CatchHandler)
 	r.Use(handler.LogMiddleware())
 	r.Use(mux.CORSMethodMiddleware(r))
 

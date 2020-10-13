@@ -1,0 +1,8 @@
+nameserver: 'ddns.verst.eu.'
+
+users:
+  - username: test
+    password: test
+    zones:
+      - example.org
+      - example.net
