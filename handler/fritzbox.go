@@ -22,6 +22,9 @@ func FritzboxHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     return
   }
+
+  log.Info().Str("user", u).Interface("query", r.URL.Query()).Msg(r.URL.Path)
+
   user, err := config.GetUserBasic(u, p)
   if err == config.ErrAuth {
     log.Warn().Err(err).Str("username", u).Interface("ip", getUserIp(r)).
@@ -47,17 +50,19 @@ func FritzboxHandler(w http.ResponseWriter, r *http.Request) {
   domains := strings.Split(r.URL.Query().Get("domain"), ",")
 
   zones := make(map[string][]string)
+  c := 0
   for _, zone := range user.Zones {
     z := dnsh.Fqdn(zone)
     dd := make([]string, 0)
     for _, d := range domains {
       if dnsh.IsSubDomain(z, dnsh.Fqdn(d)) {
         dd = append(dd, dnsh.Fqdn(d))
+        c++
       }
     }
     zones[z] = dd
   }
-  if len(zones) == 0 {
+  if c == 0 {
     w.WriteHeader(http.StatusNotFound)
     return
   }

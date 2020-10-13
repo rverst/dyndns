@@ -16,11 +16,11 @@ import (
 )
 
 var (
-	version = "unknown"
+	Version = "unknown"
 
 	flPort   uint16 = 8080
 	flBind          = "0.0.0.0"
-	flConfig        = "config.json"
+	flConfig        = "config.yaml"
 	flLogLvl        = "info"
 )
 
@@ -29,7 +29,7 @@ func main() {
 
 	flaggy.SetName("dyndns")
 	flaggy.SetDescription("Server for dynamic DNS updates.")
-	flaggy.SetVersion(version)
+	flaggy.SetVersion(Version)
 
 	flaggy.String(&flConfig, "c", "config", "path to the configuration file")
 	flaggy.String(&flBind, "b", "bind", "address to which the server will bind")
@@ -38,7 +38,7 @@ func main() {
 	flaggy.Parse()
 
 	if os.Getenv("DYNDNS_PORT") != "" {
-		if up, err := strconv.ParseUint(os.Getenv("DYNDNS_PORT"), 10, 16); err != nil {
+		if up, err := strconv.ParseUint(os.Getenv("DYNDNS_PORT"), 10, 16); err == nil {
 			flPort = uint16(up)
 		}
 	}
@@ -90,6 +90,7 @@ func listen() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/health", handler.HealthHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/dnsupdate/fritz", handler.FritzboxHandler).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/dnsupdate/fritz/", handler.FritzboxHandler).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/", handler.CatchHandler)
 	r.Use(handler.LogMiddleware())
