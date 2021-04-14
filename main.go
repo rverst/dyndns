@@ -1,18 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/integrii/flaggy"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+  "fmt"
+  "github.com/gorilla/mux"
+  "github.com/integrii/flaggy"
+  "github.com/rs/zerolog"
+  "github.com/rs/zerolog/log"
   "github.com/rverst/dyndns/config"
+  "github.com/rverst/dyndns/dns"
+  "github.com/rverst/dyndns/dns/provider/file"
+  "github.com/rverst/dyndns/dns/provider/gandi"
   "github.com/rverst/dyndns/handler"
-	"net/http"
-	"os"
-	"strconv"
-	"strings"
-	"time"
+  "net/http"
+  "os"
+  "strconv"
+  "strings"
+  "time"
 )
 
 var (
@@ -81,7 +84,24 @@ func main() {
 	log.Logger = zerolog.New(consoleWriter).Level(level).With().Caller().Timestamp().Logger()
 
 	if err := config.LoadConfig(flConfig); err != nil {
-	  log.Fatal().Err(err).Send()
+		log.Fatal().Err(err).Send()
+	}
+
+  p := os.Getenv("DYNDNS_PROVIDER")
+  p = strings.Replace(p, ";", ",", -1)
+  ps := strings.Split(p, ",")
+  for _, s := range ps {
+    var pro dns.Provider
+    var err error
+    switch strings.ToLower(strings.Trim(s, " ")) {
+    case "file":
+      pro = file.New()
+    case "gandi":
+      pro, err = gandi.New()
+    }
+    if err == nil {
+      dns.AddProvider(pro)
+    }
   }
 	listen()
 }
@@ -108,4 +128,3 @@ func listen() {
 	log.Info().Msgf("listener stated: %s", addr)
 	log.Fatal().Err(srv.ListenAndServe()).Send()
 }
-
