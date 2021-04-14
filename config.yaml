@@ -1,4 +1,7 @@
+# important for some providers to set e.g. the SOA record
 nameserver: 'ddns.example.org.'
+
+# important for some providers to set e.g. the SOA record
 mailbox: 'hostmaster.example.org.'
 
 users:
