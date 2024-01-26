@@ -1,6 +1,6 @@
 FROM golang:1.20 AS BUILDER
 
-ARG version=unknown
+ARG VERSION=unknown
 
 WORKDIR $GOPATH/src/github.com/rverst/dyndns
 
