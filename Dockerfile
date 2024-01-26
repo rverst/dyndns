@@ -1,12 +1,10 @@
-FROM golang:1.15 AS BUILDER
+FROM golang:1.20 AS BUILDER
 
-ARG version=unknown
+ARG VERSION=unknown
 
 WORKDIR $GOPATH/src/github.com/rverst/dyndns
 
 ENV CGO_ENABLED 0
-ENV GOOS=linux
-ENV GOARCH=amd64
 
 COPY . .
 
